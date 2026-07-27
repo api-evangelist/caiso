@@ -1,0 +1,376 @@
+aid: caiso
+name: California ISO
+review:
+  question: >-
+    Does the California ISO publish a genuinely open, machine-readable public
+    API surface — and does any consumer energy data mandate (Green Button /
+    ESPI, Consumer Data Right, Ontario regulation) apply to it?
+  answer: true
+  date: '2026-07-27'
+  reviewer: API Evangelist
+  summary: |
+    Yes for market data, no for consumer data, and no mandate of the
+    consumer-data-right kind applies at all. CAISO is a wholesale system and
+    market operator with no retail customers, so Green Button / ESPI, the
+    Australian CDR energy rules, and Ontario's Green Button regulation are all
+    out of scope by construction. What CAISO does answer to is the US federal
+    open-access transparency regime — FERC Order Nos. 888/889 require
+    transmission providers to operate an Open Access Same-time Information
+    System — and that obligation is unambiguously IMPLEMENTED: the OASIS
+    Download API returned real, parseable market data to anonymous curl
+    requests during this review, with no key, no token, no account, and no
+    referrer. Everything else CAISO runs is closed, and CAISO says so in
+    writing.
+
+mandate:
+  regime: other
+  regime_detail: >-
+    US federal open-access wholesale transparency, not a consumer data right.
+    FERC Order No. 889 (1996) required public utilities that own, control, or
+    operate interstate transmission facilities to create or join an Open Access
+    Same-time Information System publishing transmission capacity and market
+    information on the internet to FERC-defined standards. CAISO operates its
+    OASIS at oasis.caiso.com in satisfaction of that open-access regime and its
+    own FERC-approved tariff.
+  status: live-implemented
+  how_verified: >-
+    Not verified from a press release or a compliance page. Verified by calling
+    the interface anonymously on 2026-07-27 and parsing what came back.
+    GET https://oasis.caiso.com/oasisapi/SingleZip?queryname=PRC_LMP&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&market_run_id=DAM&node=LAPLMG1_7_B2&resultformat=6
+    returned HTTP 200, content-type application/x-zip-compressed, 1,700 bytes,
+    which unzipped to
+    20260720_20260721_PRC_LMP_DAM_20260727_06_13_39_v1.csv containing real
+    day-ahead LMP rows for node LAPLMG1_7_B2. Three further query names from
+    CAISO's own public FAQ were confirmed live the same way: SLD_FCST (HTTP 200,
+    8,952 bytes), SLD_REN_FCST (HTTP 200, 1,857 bytes), ATL_PNODE (HTTP 200,
+    266,800 bytes), and PRC_INTVL_LMP version=3 (HTTP 200, 1,660 bytes). The
+    GroupZip servlet was confirmed at
+    https://oasis.caiso.com/oasisapi/GroupZip?groupid=DAM_LMP_GRP&startdatetime=20260720T07:00-0000&version=1&resultformat=6
+    (HTTP 200, 10,161,976 bytes). Note http:// requests 302-redirect to https://
+    at the BigIP edge before serving.
+  not_applicable_regimes:
+    - regime: green-button-voluntary
+      why: >-
+        Green Button / ESPI describes the exchange of an individual retail
+        customer's interval usage and billing data. CAISO has no retail
+        customers and holds no customer-level usage data. No Green Button,
+        ESPI, Download My Data, or Connect My Data reference of any kind was
+        found on caiso.com during this review.
+    - regime: cdr-energy
+      why: Australian statute; CAISO is a United States entity.
+    - regime: green-button-ontario
+      why: Ontario regulation; CAISO is a United States entity.
+    - regime: smart-meter-infrastructure
+      why: >-
+        Metering at premises level sits with the California investor-owned
+        utilities (PG&E, SCE, SDG&E) under CPUC jurisdiction, not with the ISO.
+
+data_standard:
+  implemented: >-
+    IEC CIM-derived XML for OASIS report payloads (the OASIS interface
+    specification describes returns "in CIM format" validated against
+    CAISO-published XSDs), with a CSV alternative selected by resultformat=6.
+    Beyond that the query and report vocabulary (queryname, groupid,
+    market_run_id, PRC_LMP, SLD_FCST, ATL_PNODE, etc.) is proprietary to CAISO.
+  consumer_standard: no standard reference found
+  note: >-
+    No Green Button, ESPI, OpenADR, IEEE 2030.5, OCPP or OCPI reference was
+    found on any CAISO public surface probed. The Today's Outlook feeds are
+    plain untyped CSV with no standard behind them.
+
+consumer_vs_market_split:
+  consumer_data_api: false
+  consumer_detail: >-
+    None exists and none can. CAISO is a wholesale operator; the retail customer
+    relationship, the meter, and the bill all belong to the load-serving
+    entities. There is no documented API, gated or otherwise, by which a third
+    party could obtain an individual customer's usage or billing data from
+    CAISO.
+  market_data_open: true
+  market_detail: >-
+    Two independent open surfaces, both anonymous. (1) The OASIS Download API
+    (SingleZip / GroupZip) over the full wholesale market record — LMPs at nodal,
+    aggregate and hub level, day-ahead / HASP / RTM / RTPD runs, system load and
+    renewables forecasts, ancillary services, CRR, nomogram and constraint data,
+    and the ATLAS reference tables. CAISO's public FAQ states data retention is
+    roughly the previous 39 months for most reports and that individual reports
+    cap how many days a single request may span. (2) The Today's Outlook CSV
+    feeds. Confirmed live 2026-07-27, all HTTP 200 text/csv:
+    https://www.caiso.com/outlook/current/fuelsource.csv (4,793 bytes,
+    five-minute generation by fuel with a Batteries column),
+    /outlook/current/demand.csv (6,520), /outlook/current/netdemand.csv (7,124),
+    /outlook/current/co2.csv (2,146), and dated history at
+    /outlook/history/20260720/{fuelsource,demand,netdemand,co2}.csv (18,323 /
+    7,590 / 9,284 / 8,100 bytes). Probed and 404: supply.csv, emissions.csv,
+    batteries.csv, curtailment.csv, prices.csv, curtailedcapacity.csv,
+    gasprices.csv. CAISO's own FAQ warns Today's Outlook is telemetry-based and
+    will not reconcile with market-based OASIS output.
+
+access_gate:
+  gate: self-serve
+  gate_detail: >-
+    Deliberately recorded against the API surface, not the documentation.
+    A developer needs to do nothing at all to call the OASIS API or the Today's
+    Outlook feeds — construct the query string and send an anonymous HTTPS GET.
+    That is the most permissive possible form of self-serve and it was proven,
+    not assumed. The reference documentation is a different story: CAISO's OASIS
+    FAQ states verbatim that "Developer Site access requires Users to sign up
+    with an ISO recognized @domain email address and a detailed justification.
+    (e.g. @yahoo.com, @hotmail.com, @gmail.com, etc. would be subject to
+    rejection)" — that is application-approval, not self-serve, and it gates the
+    OASIS Interface Specification, the API URL Examples, and the Acceptable Use
+    Policy. Two public PDFs partly compensate: the OASIS FAQ and the OASIS
+    interface specification, both fetched anonymously at HTTP 200.
+  documentation_gate: application-approval
+  participant_systems_gate: partner-only
+  participant_detail: >-
+    CAISO's own access page states verbatim: "All systems and applications,
+    except Open Access Same Time Information System (OASIS), require a UAA to
+    grant and remove access." A User Access Administrator is designated by a
+    registered market participant company; individuals cannot self-register.
+    Every non-OASIS interface — market submission, dispatch, settlements,
+    CMRI/SIBR-class portals, ICCP/RIG/DPG telemetry links — sits behind that
+    plus PKI client certificates chained to the CAISO issuing authority.
+  gated: false
+
+auth_model:
+  oasis_download_api: >-
+    None. Anonymous HTTPS GET. No API key, no bearer token, no OAuth, no
+    signature, no cookie required — confirmed by clean-session curl with no
+    credentials.
+  todays_outlook_feeds: None. Anonymous HTTPS GET of a static CSV.
+  developer_documentation_site: >-
+    Forms-based authentication over SharePoint. Anonymous GET of
+    https://developer.caiso.com/ returns HTTP 403 FORBIDDEN with response
+    headers X-Forms_Based_Auth_Required:
+    https://developer.caiso.com/_login/DeveloperLogin.aspx and
+    X-Forms_Based_Auth_Return_Url. Username/password login page HTTP 200 with a
+    "Sign up" link to /_login/developersignup.aspx (HTTP 200), but signup is
+    reviewed against corporate email domain and justification.
+  participant_systems: >-
+    X.509 client certificates issued under CAISO's own PKI ("ISO customer
+    certificates are chained to the CAISO issuing authority"), plus
+    UAA-sponsored named user accounts. API server connections additionally
+    require trusting Sectigo intermediate and root certificates. Effectively
+    mutual TLS plus sponsored identity.
+  openid_connect: >-
+    Not served. https://www.caiso.com/.well-known/openid-configuration returned
+    HTTP 404; https://developer.caiso.com/.well-known/openid-configuration
+    returned HTTP 500 with a 25-byte body. Neither is a discovery document.
+
+home_market: United States
+tier: system-operator
+market_footprint: >-
+  California ISO balancing authority area covering approximately 80 percent of
+  California plus a portion of Nevada; the Western Energy Imbalance Market
+  (WEIM) and Extended Day-Ahead Market (EDAM) extend CAISO-operated market
+  services across additional balancing authorities in the Western
+  Interconnection.
+
+probes:
+  date: '2026-07-27'
+  note: >-
+    Every URL below was probed with curl following redirects. Status is the
+    final HTTP status after redirects unless noted. 000 means the host did not
+    resolve or the connection could not be established.
+  results:
+    - url: https://www.caiso.com/
+      status: 200
+      note: Corporate site.
+    - url: https://caiso.com/
+      status: 000
+      note: Apex host did not connect; www is canonical.
+    - url: https://developer.caiso.com/
+      status: 403
+      note: SharePoint developer site; X-Forms_Based_Auth_Required header returned.
+    - url: https://developer.caiso.com/_login/DeveloperLogin.aspx
+      status: 200
+      note: Login page. Text reads "This site provides detailed descriptions of current and emerging Application Programming Interfaces (APIs), acceptable use, connectivity, sample code, and frequently asked questions."
+    - url: https://developer.caiso.com/_login/developersignup.aspx
+      status: 200
+      note: Self-serve signup form, but reviewed against corporate email domain plus written justification per CAISO's OASIS FAQ.
+    - url: https://developers.caiso.com/
+      status: 000
+    - url: https://docs.caiso.com/
+      status: 000
+    - url: https://api.caiso.com/
+      status: 000
+    - url: https://data.caiso.com/
+      status: 000
+    - url: https://portal.caiso.com/
+      status: 000
+      note: Referenced from caiso.com as the Market Participant Portal but did not connect anonymously.
+    - url: https://oasis.caiso.com/mrioasis/logon.do
+      status: 200
+      note: OASIS web application landing page, publicly reachable.
+    - url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=PRC_LMP&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&market_run_id=DAM&node=LAPLMG1_7_B2&resultformat=6
+      status: 200
+      note: application/x-zip-compressed, 1700 bytes, unzipped to a real day-ahead LMP CSV. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=SLD_FCST&market_run_id=DAM&resultformat=6&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1
+      status: 200
+      note: 8952 bytes. System load forecast. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/SingleZip?resultformat=6&queryname=SLD_REN_FCST&version=1&market_run_id=DAM&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000
+      status: 200
+      note: 1857 bytes. Wind and solar forecast. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=ATL_PNODE&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&resultformat=6
+      status: 200
+      note: 266800 bytes. ATLAS pricing-node reference data. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=PRC_INTVL_LMP&market_run_id=RTM&node=LAPLMG1_7_B2&startdatetime=20260720T07:00-0000&enddatetime=20260720T09:00-0000&version=3&resultformat=6
+      status: 200
+      note: 1660 bytes. Real-time interval LMP. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/GroupZip?groupid=DAM_LMP_GRP&startdatetime=20260720T07:00-0000&version=1&resultformat=6
+      status: 200
+      note: 10161976 bytes. Bulk day-ahead LMP group download. Anonymous.
+    - url: https://oasis.caiso.com/oasisapi/openapi.json
+      status: 404
+      note: application/json 92 bytes. No OpenAPI served.
+    - url: https://oasis.caiso.com/openapi.json
+      status: 404
+    - url: https://oasis.caiso.com/swagger.json
+      status: 404
+    - url: https://www.caiso.com/openapi.json
+      status: 404
+    - url: https://www.caiso.com/swagger.json
+      status: 404
+    - url: https://www.caiso.com/api-docs
+      status: 404
+    - url: https://www.caiso.com/api
+      status: 400
+    - url: https://www.caiso.com/developers
+      status: 404
+    - url: https://www.caiso.com/docs
+      status: 404
+    - url: https://www.caiso.com/.well-known/openid-configuration
+      status: 404
+    - url: https://www.caiso.com/.well-known/security.txt
+      status: 404
+    - url: https://developer.caiso.com/.well-known/openid-configuration
+      status: 500
+      note: 25-byte body, not a discovery document.
+    - url: https://www.caiso.com/documents/oasisapispecification.pdf
+      status: 200
+      note: application/pdf, 659931 bytes. "Interface Specification for OASIS" version 3.04, dated 12/14/2010. Documents the SingleZip and GroupZip servlets, resultformat=5 (XML) / 6 (CSV), the CIM XSDs, and per-report query names. Publicly downloadable with no login.
+    - url: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+      status: 200
+      note: application/pdf, 500669 bytes. Current OASIS FAQ; cites https://oasis.caiso.com/oasisapi/SingleZip as the live path with 2025-dated worked examples, states the 39-month retention, and states the developer-site signup restriction verbatim.
+    - url: https://www.caiso.com/systems-applications/developer-portal
+      status: 200
+    - url: https://www.caiso.com/systems-applications/requesting-access-certificates
+      status: 200
+      note: Source of the verbatim UAA and PKI statements recorded above.
+    - url: https://www.caiso.com/systems-applications/portals-applications
+      status: 200
+    - url: https://www.caiso.com/todays-outlook
+      status: 200
+    - url: https://www.caiso.com/todays-outlook/supply
+      status: 200
+    - url: https://www.caiso.com/todays-outlook/prices
+      status: 200
+    - url: https://www.caiso.com/todays-outlook/emissions
+      status: 200
+    - url: https://www.caiso.com/outlook/current/fuelsource.csv
+      status: 200
+      note: text/csv, 4793 bytes, five-minute generation by fuel.
+    - url: https://www.caiso.com/outlook/current/demand.csv
+      status: 200
+      note: text/csv, 6520 bytes.
+    - url: https://www.caiso.com/outlook/current/netdemand.csv
+      status: 200
+      note: text/csv, 7124 bytes.
+    - url: https://www.caiso.com/outlook/current/co2.csv
+      status: 200
+      note: text/csv, 2146 bytes, CO2 by resource type.
+    - url: https://www.caiso.com/outlook/history/20260720/fuelsource.csv
+      status: 200
+      note: text/csv, 18323 bytes. Dated history path confirmed.
+    - url: https://www.caiso.com/outlook/current/supply.csv
+      status: 404
+    - url: https://www.caiso.com/outlook/current/emissions.csv
+      status: 404
+    - url: https://www.caiso.com/outlook/current/batteries.csv
+      status: 404
+    - url: https://www.caiso.com/outlook/current/curtailment.csv
+      status: 404
+    - url: https://www.caiso.com/outlook/current/prices.csv
+      status: 404
+    - url: https://www.caiso.com/library/business-practice-manuals
+      status: 200
+    - url: https://caiso.my.site.com/custsvccomm/s/knowledge-articles
+      status: 200
+    - url: https://www.caiso.com/favicon.ico
+      status: 200
+    - url: https://www.caiso.com/apple-touch-icon.png
+      status: 200
+      note: image/png, 17452 bytes. Used as the provider image.
+    - url: https://api.github.com/orgs/caiso
+      status: 200
+      note: >-
+        An organization named CAISO exists with one public repo but carries no
+        name, blog, or description. Ownership by the California ISO could not be
+        confirmed, so it was deliberately NOT recorded as a GitHubOrganization
+        property.
+
+contracts:
+  openapi_found: false
+  asyncapi_found: false
+  postman_found: false
+  graphql_found: false
+  note: >-
+    No machine-readable API contract of any kind is published. The OASIS API is
+    described only in prose PDFs, and the only schema artifacts referenced are
+    the CIM XSDs named inside the 2010 interface specification. No openapi/
+    directory was created because nothing real was found to put in it. Deriving
+    an OpenAPI from the PDFs is enrichment work, not harvest, and was
+    deliberately not done here.
+
+verbatim_quotes:
+  - source: https://www.caiso.com/systems-applications/requesting-access-certificates
+    quote: >-
+      All systems and applications, except Open Access Same Time Information
+      System (OASIS), require a UAA to grant and remove access.
+  - source: https://www.caiso.com/systems-applications/requesting-access-certificates
+    quote: >-
+      ISO customer certificates are chained to the CAISO issuing authority.
+  - source: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+    quote: >-
+      The California ISO Developer Site https://developer.caiso.com contains the
+      OASIS Interface Specification, additional API URL Examples documents, and
+      our Acceptable Use Policy (AUP) information. Note: Developer Site access
+      requires Users to sign up with an ISO recognized @domain email address and
+      a detailed justification. (e.g. @yahoo.com, @hotmail.com, @gmail.com,
+      etc. would be subject to rejection)
+  - source: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+    quote: >-
+      The OASIS data retention for the majority of the reports available is the
+      previous 39 months.
+  - source: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+    quote: >-
+      The data provided on OASIS does not directly match the data found on
+      Today's Outlook. Today's Outlook is designed to provide data in a
+      summarized manner and is Telemetry based, while OASIS is Market output
+      based.
+  - source: https://developer.caiso.com/_login/DeveloperLogin.aspx
+    quote: >-
+      Welcome to the ISO's site for developers to interface with our technical
+      systems and services. This site provides detailed descriptions of current
+      and emerging Application Programming Interfaces (APIs), acceptable use,
+      connectivity, sample code, and frequently asked questions.
+
+sources:
+  - url: https://www.caiso.com/
+    type: Website
+  - url: https://www.caiso.com/systems-applications/developer-portal
+    type: Documentation
+  - url: https://www.caiso.com/systems-applications/requesting-access-certificates
+    type: Authentication
+  - url: https://www.caiso.com/documents/oasisapispecification.pdf
+    type: Documentation
+  - url: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+    type: Documentation
+  - url: https://www.caiso.com/todays-outlook
+    type: Documentation
+  - url: https://developer.caiso.com/_login/DeveloperLogin.aspx
+    type: SignUp
+  - url: https://www.ferc.gov/OASIS
+    type: Regulation
+    note: FERC's own OASIS page, background for the Order 888/889 open-access transparency regime.
