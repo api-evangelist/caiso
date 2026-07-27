@@ -1,0 +1,317 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Interface Specification for OASIS v3.04, sections 5 through 8
+  (https://www.caiso.com/documents/oasisapispecification.pdf), plus the current OASIS FAQ
+  (https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf)
+name: CAISO OASIS report and parameter vocabulary
+description: >-
+  The OASIS Download API has no path-based resource model — the controlled vocabulary IS
+  the API. A caller names a report with `queryname` (or a bundle with `groupid`), a market
+  or process with `market_run_id`, and a response format with `resultformat`. This file is
+  the transcribed registry of those terms as CAISO publishes them, grouped by the report
+  tabs used in the OASIS interface specification, with the report-specific filter
+  parameters each one takes. It is a faithful transcription, not an inference: every
+  queryname, groupid and filter below appears in a CAISO document. Note that the published
+  specification was last revised in 2010, so it does not contain later additions such as
+  SLD_REN_FCST and PRC_RTPD_LMP — those are taken from the current FAQ and are marked with
+  their source.
+terms:
+  prices:
+  - name: PRC_LMP
+    title: Locational Marginal Prices
+    detail: Hourly LMP with congestion, loss and energy components for all PNodes and APNodes, $/MWh.
+    filters: [market_run_id, node, grp_type]
+    source: spec-v3.04
+  - name: PRC_INTVL_LMP
+    title: Interval Locational Marginal Prices
+    detail: Five-minute RTM LMP for all PNodes and APNodes.
+    filters: [market_run_id, node, grp_type, opr_hr]
+    source: spec-v3.04
+  - name: PRC_RTPD_LMP
+    title: Fifteen Minute Market (FMM) Locational Marginal Prices
+    filters: [market_run_id, node, grp_type]
+    source: faq
+  - name: PRC_HASP_LMP
+    title: HASP Locational Marginal Prices
+    filters: [market_run_id, node, grp_type, opr_hr]
+    source: spec-v3.04
+  - name: PRC_CURR_LMP
+    title: Current Locational Marginal Price
+    detail: Most recently posted five-minute interval for all generator PNodes and APNodes; download only.
+    filters: [node]
+    source: spec-v3.04
+  - name: PRC_CURR_HUB_LMP
+    title: Current Trading Hub LMP
+    source: spec-v3.04
+  - name: PRC_AS
+    title: AS Clearing Prices
+    detail: Ancillary services regional shadow prices by AS region and sub-regional partition, $/MW.
+    filters: [market_run_id, anc_type, anc_region]
+    source: spec-v3.04
+  - name: PRC_INTVL_AS
+    title: Interval AS Clearing Prices
+    filters: [market_run_id, anc_type, anc_region, opr_hr]
+    source: spec-v3.04
+  - name: PRC_CNSTR
+    title: Intertie Constraint Shadow Prices
+    filters: [market_run_id, ti_id]
+    source: spec-v3.04
+  - name: PRC_NOMOGRAM
+    title: Nomogram/Branch Shadow Prices
+    filters: [market_run_id, nomogram_id]
+    source: spec-v3.04
+  - name: PRC_RTM_NOMOGRAM
+    title: Interval Nomogram/Branch Shadow Prices
+    filters: [market_run_id, nomogram_id]
+    source: spec-v3.04
+  - name: PRC_RTM_FLOWGATE
+    title: Interval Intertie Constraint Shadow Prices
+    filters: [market_run_id, ti_id]
+    source: spec-v3.04
+  - name: PRC_FUEL
+    title: Fuel Prices
+    detail: Daily gas price in $/mmBtu by fuel region.
+    filters: [fuel_region_id]
+    source: spec-v3.04
+  - name: PRC_DS_REF
+    title: Reference Prices
+    detail: Quarterly reference prices per node for convergence bidding.
+    filters: [market_run_id, node, grp_type]
+    source: spec-v3.04
+  - name: CB_NODAL_GRP_CNSTR_PRC
+    title: Nodal Group Constraints
+    filters: [resultformat]
+    source: spec-v3.04
+  transmission:
+  - name: TRNS_CURR_USAGE
+    title: Current Transmission Usage
+    filters: [ti_id, ti_direction]
+    source: spec-v3.04
+  - name: TRNS_ATC
+    title: Market Available Transmission Capacity
+    filters: [market_run_id, ti_id, ti_direction]
+    source: spec-v3.04
+  - name: TRNS_OUTAGE
+    title: Transmission Outages
+    filters: [ti_id, ti_direction]
+    source: spec-v3.04
+  - name: TRNS_USAGE
+    title: Transmission Interface Usage
+    filters: [market_run_id, ti_id, ti_direction]
+    source: spec-v3.04
+  system_demand:
+  - name: SLD_FCST
+    title: CAISO Demand Forecast
+    detail: Hourly forecast MW demand for the operating day; 2DA, 7DA, DAM, ACTUAL and RTM processes.
+    filters: [market_run_id]
+    source: spec-v3.04
+  - name: SLD_FCST_PEAK
+    title: CAISO Peak Demand Forecast
+    source: spec-v3.04
+  - name: SLD_REN_FCST
+    title: Wind and Solar Forecast
+    detail: Renewables forecast; DAM, ACTUAL, HASP, RTD and RTPD processes.
+    filters: [market_run_id]
+    source: faq
+  energy:
+  - name: ENE_SLRS
+    title: System Load and Resource Schedules
+    filters: [market_run_id, tac_zone_name, schedule]
+    source: spec-v3.04
+  - name: ENE_EA
+    title: Energy Adjustments
+    filters: [energy_type, opr_interval]
+    source: spec-v3.04
+  - name: ENE_MPM
+    title: Market Power Mitigation
+    filters: [market_run_id]
+    source: spec-v3.04
+  - name: ENE_DISP
+    title: Exceptional Dispatch
+    source: spec-v3.04
+  - name: ENE_LOSS
+    title: Marginal Losses
+    filters: [market_run_id]
+    source: spec-v3.04
+  - name: ENE_CB_AWARDS
+    title: Convergence Bidding Awards
+    source: spec-v3.04
+  - name: ENE_CB_CLR_AWARDS
+    title: Net Cleared Convergence Bidding Awards
+    source: spec-v3.04
+  - name: ENE_CB_MKT_SUM
+    title: Day Ahead Market Summary Report
+    detail: Renamed from ENE_MKT_RPT in specification revision 3.03.
+    source: spec-v3.04
+  - name: CB_NODAL_LIMITS
+    title: Nodal Limits
+    filters: [node_id, resultformat]
+    source: spec-v3.04
+  - name: CMMT_RMR
+    title: RMR Commitment
+    filters: [market_run_id]
+    source: spec-v3.04
+  - name: CMMT_RA_MLC
+    title: Resource Adequacy Minimum Load Commitment
+    filters: [market_run_id]
+    source: spec-v3.04
+  ancillary_services:
+  - name: AS_REQ
+    title: AS Requirements
+    filters: [market_run_id, anc_type, anc_region]
+    source: spec-v3.04
+  - name: AS_RESULTS
+    title: AS Results
+    filters: [market_run_id, anc_type, anc_region]
+    source: spec-v3.04
+  - name: AS_OP_RSRV
+    title: Operating Reserves
+    source: spec-v3.04
+  congestion_revenue_rights:
+  - name: CRR_CLEARING
+    title: CRR Clearing Prices
+    filters: [market_name, market_term, time_of_use]
+    source: spec-v3.04
+  - name: CRR_INVENTORY
+    title: CRR Inventory
+    filters: [market_name, market_term, time_of_use]
+    source: spec-v3.04
+  public_bids:
+  - name: PUB_BID
+    title: Public Bids
+    detail: Retrieved via GroupZip (PUB_DAM_GRP for DAM, PUB_RTM_GRP for RTM). Posted at T+90.
+    source: spec-v3.04
+  - name: PUB_CB_BID
+    title: Convergence Bidding Public Bids
+    detail: Retrieved via GroupZip (PUB_CB_DAM_GRP).
+    source: spec-v3.04
+  atlas_reference_data:
+  - name: ATL_PNODE
+    title: PNode Listing
+    filters: [pnode_id, pnode_type]
+    source: spec-v3.04
+  - name: ATL_APNODE
+    title: APNode Listing
+    filters: [apnode_type]
+    source: spec-v3.04
+  - name: ATL_PNODE_MAP
+    title: PNode to APNode Mapping
+    filters: [pnode_id]
+    source: spec-v3.04
+  - name: ATL_LAP
+    title: Load Aggregation Point Listing
+    filters: [apnode_type]
+    source: spec-v3.04
+  - name: ATL_LDF
+    title: Load Distribution Factors
+    filters: [apnode_id]
+    source: spec-v3.04
+  - name: ATL_HUB
+    title: Trading Hub Listing
+    source: spec-v3.04
+  - name: ATL_RESOURCE
+    title: Resource Listing
+    filters: [resource_id, agge_type, resource_type]
+    source: spec-v3.04
+  - name: ATL_AS_REGION_MAP
+    title: AS Region Mapping
+    filters: [as_region_id]
+    source: spec-v3.04
+  - name: ATL_RUC_ZONE_MAP
+    title: RUC Zone to PNode Mapping
+    source: spec-v3.04
+  - name: ATL_TAC_AREA_MAP
+    title: TAC Area Mapping
+    source: spec-v3.04
+  - name: ATL_TIEPOINT
+    title: Tie Point Listing
+    filters: [resource_type]
+    source: spec-v3.04
+  - name: ATL_TI
+    title: Transmission Interface Listing
+    filters: [ti_type, wecc_path]
+    source: spec-v3.04
+  - name: ATL_OSM
+    title: Operating Sub-Market Listing
+    source: spec-v3.04
+  - name: ATL_PUB_SCHED
+    title: Publication Schedule
+    source: spec-v3.04
+  - name: ATL_PEAK_ON_OFF
+    title: Peak / Off-Peak Definition
+    detail: Hourly peak/off-peak indicator per the WECC definition.
+    source: spec-v3.04
+groups:
+  description: Values for the GroupZip `groupid` parameter, as published in the specification.
+  values:
+  - DAM_LMP_GRP
+  - RUC_LMP_GRP
+  - RTM_LMP_GRP
+  - HASP_LMP_GRP
+  - CURR_LMP_GRP
+  - DAM_PRC_AS_GRP
+  - HASP_PRC_AS_GRP
+  - DAM_AS_GRP
+  - HASP_AS_GRP
+  - DAM_TRNS_GRP
+  - HASP_TRNS_GRP
+  - DAM1_GRP
+  - RTM1_GRP
+  - HASP1_GRP
+  - POST1_GRP
+  - CRR1_GRP
+  - DAM_SD_PRC_GRP
+  - HASP_SD_PRC_GRP
+  - RTM_SD_PRC_GRP
+  - PUB_DAM_GRP
+  - PUB_RTM_GRP
+  - PUB_CB_DAM_GRP
+  - CB_CLR_DAM_GRP
+  - CB_REF_PRC_GRP
+  - CB_NODAL_LMT_GRP
+  - DA_GROUP
+enumerations:
+  market_run_id:
+    description: >-
+      Market or process. Valid values are report-specific; these are the values CAISO's own
+      published examples use.
+    values:
+    - {value: DAM, meaning: Day-Ahead Market}
+    - {value: RUC, meaning: Residual Unit Commitment}
+    - {value: HASP, meaning: Hour-Ahead Scheduling Process}
+    - {value: RTM, meaning: Real-Time Market}
+    - {value: RTPD, meaning: Real-Time Pre-Dispatch (fifteen minute market)}
+    - {value: RTD, meaning: Real-Time Dispatch (five minute)}
+    - {value: 2DA, meaning: Two-day-ahead forecast}
+    - {value: 7DA, meaning: Seven-day-ahead forecast}
+    - {value: ACTUAL, meaning: Actuals}
+  resultformat:
+    values:
+    - {value: '5', meaning: CIM XML}
+    - {value: '6', meaning: CSV}
+  grp_type:
+    values:
+    - {value: ALL, meaning: All nodes}
+    - {value: ALL_APNODES, meaning: All aggregate pricing nodes}
+xml_schemas:
+- {file: oasisReport.xsd, category: OASIS report data}
+- {file: oasisBid.xsd, category: Public bids}
+- {file: oasiscbBid.xsd, category: Convergence bidding public bids}
+- {file: oasisMaster.xsd, category: Atlas / reference data}
+todays_outlook_feeds:
+  description: >-
+    The separate Today's Outlook CSV vocabulary — report names for
+    https://www.caiso.com/outlook/current/{report}.csv and
+    https://www.caiso.com/outlook/history/{YYYYMMDD}/{report}.csv. Confirmed live
+    2026-07-27; columns transcribed from the returned files.
+  feeds:
+  - name: fuelsource
+    columns: [Time, Solar, Wind, Geothermal, Biomass, Biogas, Small hydro, Coal, Nuclear, Natural Gas, Large Hydro, Batteries, Imports, Other]
+  - name: demand
+    columns: [Time, Day ahead forecast, Hour ahead forecast, Current demand, Demand response]
+  - name: netdemand
+    columns: [Time, Hour ahead forecast, Current demand, Net demand, Net demand forecast, Demand response]
+  - name: co2
+    columns: [Time, Biogas CO2, Biomass CO2, Natural Gas CO2, Coal CO2, Imports CO2, Geothermal CO2]
+glossary: https://www.caiso.com/glossary

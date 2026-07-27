@@ -1,0 +1,126 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Interface Specification for OASIS v3.04, section 3.2 "Errors"
+  (https://www.caiso.com/documents/oasisapispecification.pdf), confirmed against live
+  error responses captured 2026-07-27
+format: caiso-oasis-xml
+description: >-
+  The OASIS Download API does not use RFC 9457 problem details, and it does not signal
+  application errors with HTTP status codes. A failed report request still returns HTTP
+  200 with Content-Type application/x-zip-compressed; the zip contains an OASISReport XML
+  document whose MessagePayload/RTO element carries an ERROR block with ERR_CODE and
+  ERR_DESC. Callers must therefore unzip and inspect the payload rather than branching on
+  the status line. The one true HTTP-level error is the edge throttle: HTTP 429 with an
+  HTML body, returned by the BigIP before the servlet is reached.
+envelope:
+  transport: 'HTTP 200, application/x-zip-compressed (a zip containing one XML file)'
+  filename_on_error: INVALID_REQUEST.xml.zip
+  namespace: http://www.caiso.com/soa/OASISReport_v1.xsd
+  path: m:OASISReport/m:MessagePayload/m:RTO/m:ERROR
+  fields:
+  - m:ERR_CODE
+  - m:ERR_DESC
+  example: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <m:OASISReport xmlns:m="http://www.caiso.com/soa/OASISReport_v1.xsd">
+    <m:MessageHeader>
+    	<m:TimeDate>2026-07-27T21:19:31.777Z</m:TimeDate>
+    	<m:Source>OASIS</m:Source>
+    	<m:Version>v20131201</m:Version>
+    </m:MessageHeader>
+    <m:MessagePayload>
+    <m:RTO>
+    <m:name>CAISO</m:name>
+    <m:ERROR>
+    <m:ERR_CODE>1001</m:ERR_CODE>
+    <m:ERR_DESC>Invalid Parameters of the given report name</m:ERR_DESC>
+    </m:ERROR>
+    </m:RTO>
+    </m:MessagePayload>
+    </m:OASISReport>
+errors:
+- code: '1000'
+  message: No data returned for the specified selection.
+  remediation: >-
+    Widen or shift the datetime window, or check the publication schedule — the report may
+    not have posted yet for that trade date.
+- code: '1001'
+  message: Invalid Parameters of the given report name.
+  remediation: >-
+    Each queryname has its own required variable parameters (market_run_id, node,
+    grp_type, anc_type, anc_region, version). Supply the set the report expects.
+  verified: true
+  verified_note: >-
+    Reproduced 2026-07-27 with queryname=NOT_A_REPORT — returned HTTP 200,
+    INVALID_REQUEST.xml.zip, ERR_CODE 1001.
+- code: '1002'
+  message: Invalid date format, please use valid date format.
+  remediation: >-
+    Use the yyyymmddTHH:MM-0000 GMT form for startdatetime/enddatetime (or yyyymmdd for
+    the legacy startdate/enddate parameters).
+- code: '1003'
+  message: Timed out waiting for query response.
+  remediation: Reduce the requested range or node list and retry after a pause.
+- code: '1004'
+  message: Data can be requested for period of 31 days only.
+  remediation: Split the request into windows of 31 days or fewer.
+  verified: true
+  verified_note: >-
+    Reproduced 2026-07-27 with a PRC_LMP request spanning 2024-01-01 to 2026-01-01 —
+    returned HTTP 200 with ERR_CODE 1004 inside the zip.
+- code: '1005'
+  message: Report name does not exit, please use valid report name.
+  remediation: >-
+    Use a queryname from the published report list — see
+    vocabulary/caiso-oasis-query-names.yml.
+- code: '1006'
+  message: Validation exception during transformation of XML.
+  remediation: Server-side transformation failure; retry, then report to CAISO if persistent.
+- code: '1007'
+  message: Required file for does not exist.
+  remediation: Server-side; the backing report file was not found for the request.
+- code: '1008'
+  message: Out of memory exception.
+  remediation: Request a smaller range, fewer nodes, or use GroupZip for all-node pulls.
+- code: '1009'
+  message: Exceptions in reading and writing of XML files.
+  remediation: Server-side I/O failure; retry.
+- code: '1010'
+  message: System Error.
+  remediation: Server-side; retry with backoff.
+- code: '1011'
+  message: >-
+    Empty Query; Please Enter Report Name, Startdate, EndDate and Other Parameters.
+  remediation: Supply the mandatory parameters — queryname, start/end datetime, version.
+- code: '1012'
+  message: Connection refused.
+  remediation: Upstream connectivity failure; retry with backoff.
+- code: '1013'
+  message: Required Resources (xslt or xml or dir) Unavailable.
+  remediation: Server-side resource missing; retry, then report to CAISO if persistent.
+- code: '1014'
+  message: >-
+    Start Date is beyond the limit, Please Use valid Start Date that falls within the
+    prescribed limit.
+  remediation: >-
+    Most reports retain roughly the previous 39 months; move the start date inside that
+    window.
+- code: '1015'
+  message: GroupZip DownLoad is in Processing, Please Submit request after Sometime.
+  remediation: >-
+    A GroupZip for that group and date is already being assembled; wait and re-request
+    rather than retrying immediately.
+- code: '1016'
+  message: GROUPID Does Not Exit, Please Use Valid GROUPID Name.
+  remediation: >-
+    Use a published groupid (for example DAM_LMP_GRP, HASP_LMP_GRP, DA_GROUP,
+    PUB_DAM_GRP, PUB_RTM_GRP).
+transport_errors:
+- status: 429
+  content_type: text/html
+  body: >-
+    CAISO Acceptable Use Policy Violation. Please retry your request after 5 seconds.
+  emitted_by: F5 BigIP edge, before the servlet
+  remediation: Space requests at least five seconds apart. See rate-limits/caiso-rate-limits.yml.
+  verified: true

@@ -1,0 +1,75 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  CAISO published documentation plus anonymous live calls to the OASIS Download API and
+  the Today's Outlook feeds on 2026-07-27
+docs: https://www.caiso.com/systems-applications/requesting-access-certificates
+description: >-
+  CAISO's authentication posture is a clean two-tier split. The public data tier — the
+  OASIS Download API at oasis.caiso.com/oasisapi and the Today's Outlook CSV feeds at
+  www.caiso.com/outlook — carries no authentication at all: no API key, no token, no
+  account, no referrer check. This was verified by anonymous curl on 2026-07-27, which
+  returned real zipped CSV market data. Everything else CAISO operates — market
+  submission, dispatch, settlements, CMRI, SIBR, the WEM and RC portals — sits behind
+  PKI client certificates issued to individuals sponsored by their company's User Access
+  Administrator (UAA), and CAISO states in writing that OASIS is the sole exception.
+  A third, distinct gate covers the *documentation*: developer.caiso.com requires a
+  signup reviewed against an ISO-recognized corporate email domain and a written
+  justification, so the interface specification and API URL example documents are
+  access-controlled even though the API they describe is not.
+summary:
+  types:
+  - none
+  - mutualTLS
+  api_key_in: []
+  oauth2_flows: []
+  anonymous_public_tier: true
+schemes:
+- name: anonymous
+  type: none
+  applies_to:
+  - CAISO OASIS Download API
+  - CAISO Today's Outlook Data Feeds
+  required: false
+  description: >-
+    No credential of any kind. GET the servlet or the CSV path and the data is returned.
+    Verified 2026-07-27 with SingleZip (SLD_FCST, HTTP 200, 8,952-byte zip) and with
+    https://www.caiso.com/outlook/current/fuelsource.csv (HTTP 200, text/csv).
+  sources:
+  - https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+  - live probe 2026-07-27
+- name: caiso-pki-client-certificate
+  type: mutualTLS
+  applies_to:
+  - CAISO Market Participant Portal
+  - CMRI / SIBR / settlements and other participant systems
+  required: true
+  description: >-
+    Digital certificate issued through CAISO to a named individual, requested and
+    approved by that company's User Access Administrator. Not obtainable by the general
+    public and not used by, or accepted on, the OASIS or Today's Outlook surfaces.
+  sources:
+  - https://www.caiso.com/systems-applications/requesting-access-certificates
+  - https://www.caiso.com/systems-applications/user-access-administrator-uaa
+registration:
+  required_for_api: false
+  required_for_docs: true
+  docs_signup: https://developer.caiso.com/_login/developersignup.aspx
+  cost: free
+  notes: >-
+    OASIS FAQ Question One: "Developer Site access requires Users to sign up with an ISO
+    recognized @domain email address and a detailed justification" — free-mail domains
+    (gmail, yahoo, hotmail) are subject to rejection. No such gate exists on the API
+    itself.
+not_present:
+- oauth2
+- openIdConnect
+- apiKey
+- http-bearer
+- http-basic
+transport_security:
+  https: true
+  note: >-
+    http:// requests to oasis.caiso.com 302-redirect to https:// at the BigIP edge. See
+    security/caiso-domain-security.yml — oasis.caiso.com negotiates TLS 1.2 and neither
+    host sets HSTS.

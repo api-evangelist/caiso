@@ -1,0 +1,79 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  CAISO API Terms of Use (https://www.caiso.com/privacy-terms-of-use#api-terms-of-use),
+  Interface Specification for OASIS v3.04, OASIS FAQ, CAISO release planning page, and
+  live probes on 2026-07-27
+description: >-
+  CAISO runs the OASIS interface as regulated market infrastructure rather than as a
+  developer product, and its lifecycle communication reflects that. There is no versioned
+  API path, no published deprecation policy, no Sunset or Deprecation header support, and
+  no SLA or status page for the API. Change is announced through the market-participant
+  channels — market notices, the release planning process, and the access-gated developer
+  site — and the API Terms of Use explicitly warn that backwards-incompatible changes can
+  land without notice. The one durable version signal a caller controls is the per-report
+  `version` query parameter.
+versioning:
+  scheme: per-report query parameter
+  path_versioning: false
+  current: 'varies by report: version=1, version=2 and version=12 all appear in CAISO''s own current FAQ examples'
+  docs: https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+  note: >-
+    The context path itself moved from /mrtu-oasis (as published in the v3.04 interface
+    specification) to /oasisapi, which is what CAISO's current FAQ examples use and what
+    responds today.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  statement: >-
+    "CAISO will occasionally make changes to its API, including backwards incompatible
+    changes. Accordingly, you should consider registering at developer.caiso.com to access
+    API specifications and scheduled modifications. Also, parts of the CAISO API are
+    undocumented, including certain methods, events, and properties." — CAISO API Terms of
+    Use, last updated 2019-08-22.
+  observed_retirements:
+  - what: oasissta.caiso.com (staging alias)
+    evidence: >-
+      The v3.04 specification notes "the 'oasissta' version will be retired at some point
+      in the future"; the host does not resolve as of 2026-07-27.
+  - what: oasismktsim.caiso.com (market simulation environment)
+    evidence: >-
+      Documented in the specification as the simulation host; does not resolve publicly as
+      of 2026-07-27, so there is no publicly reachable OASIS sandbox.
+  - what: /mrtu-oasis context path
+    evidence: >-
+      Superseded by /oasisapi in CAISO's current published examples.
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    No service-level commitment is published for the API. The API Terms of Use disclaim all
+    warranties, provide the API "as is", and prohibit using the API to monitor CAISO system
+    availability or performance.
+status_page: null
+status_note: >-
+  CAISO publishes grid and market condition surfaces (Today's Outlook, ISO Today, the
+  Daily Briefing, market notices) but no availability status page for the OASIS API or the
+  Today's Outlook feeds.
+data_retention:
+  window: 39 months
+  source: OASIS FAQ Question Two
+  note: >-
+    Applies to the majority of OASIS reports. Requests whose start date falls outside the
+    retained window return error 1014.
+change_communication:
+- channel: Release planning
+  url: https://www.caiso.com/systems-applications/release-planning
+  note: >-
+    Dated implementation milestones, business requirements specifications and market
+    simulation materials for each release.
+- channel: Notices
+  url: https://www.caiso.com/notices
+- channel: Daily Briefing
+  url: https://www.caiso.com/daily-briefing
+- channel: Developer site (access-gated)
+  url: https://developer.caiso.com/
+  note: Holds the interface specification, API URL example documents and scheduled modifications.
+deprecated_operations: []

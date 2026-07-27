@@ -1,0 +1,207 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Interface Specification for OASIS v3.04
+  (https://www.caiso.com/documents/oasisapispecification.pdf), OASIS FAQ
+  (https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf), CAISO API Terms
+  of Use, and live request/response capture on 2026-07-27
+description: >-
+  CAISO's two public interfaces are both read-only HTTP GET surfaces with no request body,
+  no authentication and no JSON anywhere. The OASIS Download API is a servlet-style query
+  interface: one of two servlets (SingleZip, GroupZip) plus a query string naming a report
+  and a UTC datetime window, answered with a zip archive containing CIM XML or CSV. The
+  Today's Outlook feeds are static-path CSV files regenerated on a five-minute cadence.
+  Neither surface uses REST resource paths, content negotiation, cursors, envelopes,
+  request ids or conditional requests. Everything below is what CAISO actually publishes
+  or what was observed on the wire.
+authentication:
+  style: none
+  detail: Anonymous GET. See authentication/caiso-authentication.yml.
+protocol:
+  transport: HTTPS (http redirects 302 to https at the BigIP edge)
+  methods:
+  - GET
+  request_body: none
+  content_types_returned:
+  - application/x-zip-compressed
+  - text/csv
+  content_negotiation: >-
+    None. Format is selected by the resultformat query parameter on OASIS
+    (5 = CIM XML, 6 = CSV); Today's Outlook is CSV only.
+addressing:
+  oasis:
+    base: https://oasis.caiso.com/oasisapi
+    style: servlet + query string (not REST resource paths)
+    operations:
+    - servlet: SingleZip
+      shape: >-
+        /SingleZip?queryname=<REPORT>&startdatetime=<yyyymmddTHH:MM-0000>&enddatetime=<yyyymmddTHH:MM-0000>&version=<n>&resultformat=<5|6>&<report-specific filters>
+      note: One report, caller-selected filters.
+    - servlet: GroupZip
+      shape: /GroupZip?groupid=<GROUP>&startdatetime=<yyyymmddTHH:MM-0000>&version=<n>&resultformat=<5|6>
+      note: >-
+        A bundle of SingleZips for a whole trade day. opr_hr is required for HASP and RTM
+        groups. Use this instead of looping SingleZip when all nodes are needed.
+    legacy_form: >-
+      The v3.04 specification documents startdate/enddate in yyyymmdd form and the
+      /mrtu-oasis context path; the current live context path is /oasisapi and the FAQ's
+      current examples use startdatetime/enddatetime with an explicit GMT offset.
+  todays_outlook:
+    base: https://www.caiso.com/outlook
+    style: static file paths
+    operations:
+    - shape: /current/{report}.csv
+      note: Current operating day at five-minute resolution.
+    - shape: /history/{YYYYMMDD}/{report}.csv
+      note: A past operating day.
+    reports:
+    - fuelsource
+    - demand
+    - netdemand
+    - co2
+parameters:
+  common:
+  - name: queryname
+    where: query
+    required: true
+    applies_to: SingleZip
+    description: Report code. See vocabulary/caiso-oasis-query-names.yml.
+  - name: groupid
+    where: query
+    required: true
+    applies_to: GroupZip
+    description: Report-group code (for example DAM_LMP_GRP, HASP_LMP_GRP, DA_GROUP).
+  - name: startdatetime
+    where: query
+    required: true
+    format: yyyymmddTHH:MM-0000
+    description: Inclusive window start, expressed in GMT.
+  - name: enddatetime
+    where: query
+    required: true
+    format: yyyymmddTHH:MM-0000
+    description: Window end, expressed in GMT.
+  - name: version
+    where: query
+    required: true
+    description: >-
+      Report schema revision. It is per-report, not global — CAISO's own FAQ examples use
+      version=1 (SLD_FCST, SLD_REN_FCST, AS_RESULTS), version=2 (PRC_INTVL_LMP,
+      PRC_RTPD_LMP) and version=12 (PRC_LMP).
+  - name: resultformat
+    where: query
+    required: false
+    default: 5
+    enum:
+    - '5'
+    - '6'
+    description: 5 returns CIM XML, 6 returns CSV. Omitting it yields XML.
+  - name: market_run_id
+    where: query
+    required: conditional
+    description: >-
+      Market or process the report is drawn from. Values are report-specific; the FAQ
+      names 2DA, 7DA, DAM, ACTUAL, RTM for the demand forecast and DAM, ACTUAL, HASP, RTD,
+      RTPD for the renewables forecast.
+  - name: node
+    where: query
+    required: conditional
+    description: >-
+      One or more PNode/APNode names, comma-separated, for the LMP reports.
+  - name: grp_type
+    where: query
+    required: conditional
+    description: >-
+      Set to ALL (or ALL_APNODES) instead of node to retrieve every node. When retrieving
+      ALL, only one hour (interval reports) or one trade date (hourly reports) may be
+      requested at a time.
+  - name: opr_hr
+    where: query
+    required: conditional
+    applies_to: GroupZip (HASP and RTM groups)
+    format: HH
+timezone:
+  api: GMT
+  note: >-
+    "REMINDER: The API uses GMT for its Time Zone" (OASIS FAQ, Question Eleven). A
+    California trade day therefore starts at T07:00-0000 in winter and T07:00-0000 is the
+    offset CAISO's own published examples use. Today's Outlook CSVs are stamped in local
+    Pacific clock time in the first column.
+response:
+  packaging: >-
+    Every OASIS response, success or failure, is a zip archive delivered with
+    Content-Disposition: inline and a generated filename.
+  filename_convention:
+    singlezip: startdate_enddate_ReportName_MktRunID_Stamp.zip
+    groupzip: startdate_startdate_GroupID_N_xml.zip (or _csv.zip)
+    observed: 20260720_20260721_SLD_FCST_DAM_20260727_14_19_18_v1.zip
+  xml_schemas:
+  - oasisReport.xsd
+  - oasisBid.xsd
+  - oasiscbBid.xsd
+  - oasisMaster.xsd
+  xml_note: >-
+    Payload XML is CIM-derived and declares the namespace
+    http://www.caiso.com/soa/OASISReport_v1.xsd; the XSDs themselves are distributed
+    through the access-gated developer site and are not served at that URL.
+  disclaimer_block: >-
+    Every payload embeds a DISCLAIMER_ITEM stating the contents are subject to change
+    without notice.
+pagination:
+  style: none
+  detail: >-
+    There is no cursor, offset, page or link header. Volume is controlled by narrowing the
+    datetime window and the node/filter set. The 31-day cap (error 1004) and the
+    one-hour/one-trade-date cap on all-node pulls are the real windowing constraints.
+idempotency:
+  mechanism: none
+  detail: >-
+    No idempotency key exists and none is needed — the entire public surface is read-only
+    HTTP GET with no write operations. Repeating a request re-runs the report; for
+    "current interval" reports (PRC_CURR_LMP, the Today's Outlook feeds) the same URL
+    returns newer data as the operating day advances.
+  safe_methods_only: true
+caching:
+  detail: >-
+    GroupZip files are cached server-side — the spec notes cached group files remain
+    available roughly one week back from the system date, and a group download already in
+    progress returns error 1015 rather than rebuilding.
+  http_caching: >-
+    No ETag, Last-Modified or Cache-Control conventions are documented, and none were
+    observed on the OASIS responses.
+tracing:
+  request_id: none
+  detail: >-
+    No request-id or correlation header is returned. The only per-response identifier is
+    the timestamp embedded in the generated zip filename and the MessageHeader/TimeDate
+    element in the XML payload.
+versioning:
+  scheme: per-report query parameter (version=<n>)
+  api_version: none at the path level (the /oasisapi context path is unversioned)
+  detail: >-
+    Report schema revisions are selected per request. CAISO's API Terms of Use state that
+    "CAISO will occasionally make changes to its API, including backwards incompatible
+    changes" and direct callers to register at developer.caiso.com for specifications and
+    scheduled modifications. See lifecycle/caiso-lifecycle.yml.
+errors:
+  in_band: true
+  detail: >-
+    Application errors return HTTP 200 with an ERROR block (ERR_CODE, ERR_DESC) inside the
+    zipped XML. Only the edge throttle uses a real HTTP status (429). Full catalog in
+    errors/caiso-error-codes.yml.
+rate_limiting:
+  detail: >-
+    HTTP 429 with an HTML body instructing a five-second retry, enforced at the BigIP
+    edge; no rate-limit headers. See rate-limits/caiso-rate-limits.yml.
+undocumented_surface:
+  note: >-
+    CAISO's own API Terms of Use state that "parts of the CAISO API are undocumented,
+    including certain methods, events, and properties" and that undocumented behaviour may
+    change without notice. Build only against documented query names.
+cross_links:
+  authentication: authentication/caiso-authentication.yml
+  errors: errors/caiso-error-codes.yml
+  lifecycle: lifecycle/caiso-lifecycle.yml
+  rate_limits: rate-limits/caiso-rate-limits.yml
+  vocabulary: vocabulary/caiso-oasis-query-names.yml
+  examples: examples/caiso-oasis-examples.yml

@@ -1,0 +1,87 @@
+generated: '2026-07-27'
+method: probed
+source: >-
+  CAISO API Terms of Use (https://www.caiso.com/privacy-terms-of-use#api-terms-of-use)
+  plus live 429 responses observed against https://oasis.caiso.com/oasisapi on 2026-07-27
+provider: California ISO
+providerId: caiso
+description: >-
+  CAISO publishes no numeric rate limit, quota or burst allowance for the OASIS Download
+  API, but it does enforce one at the edge. Its published API Terms of Use prohibit
+  "Adverse and Excessive Use" and reserve the right to suspend or terminate access for
+  callers who impact system performance. In practice the F5 BigIP in front of
+  oasis.caiso.com answers a request that arrives too soon after the previous one with
+  HTTP 429 and the plain-HTML body "CAISO Acceptable Use Policy Violation. Please retry
+  your request after 5 seconds." — so the operative published limit is the five-second
+  spacing named in that response body. This was verified live: two identical, valid
+  SingleZip requests issued back to back returned 200 then 429, and the same 429 is
+  returned for malformed/parameterless requests to the servlet. No X-RateLimit-* headers
+  and no Retry-After header are returned; the retry interval is only in the body text.
+  The Today's Outlook CSV feeds under www.caiso.com/outlook are served from the web tier
+  and no throttling was observed on them.
+algorithm: acceptable-use-policy-throttle
+enforcement: edge (F5 BigIP in front of oasis.caiso.com)
+responseCodes:
+  throttled: 429
+headers:
+  retry_after: false
+  ratelimit_headers: false
+  note: >-
+    The 429 carries Server: BigIP and a 114-byte HTML body; the retry guidance is in the
+    body text only, not in a header.
+limits:
+- id: oasis-request-spacing
+  scope: client-ip
+  api: CAISO OASIS Download API
+  host: oasis.caiso.com
+  limit_count: 1
+  limit_interval: 5s
+  basis: >-
+    Observed 429 body text "Please retry your request after 5 seconds." and reproduced by
+    issuing two valid SingleZip requests back to back (2026-07-27).
+  documented: false
+  verified: true
+- id: oasis-date-range-cap
+  scope: request
+  api: CAISO OASIS Download API
+  limit_count: 31
+  limit_interval: days-per-request
+  basis: >-
+    Documented in the Interface Specification for OASIS error table (code 1004, "Data can
+    be requested for period of 31 days only") and confirmed live — a PRC_LMP request
+    spanning 2024-01-01 to 2026-01-01 returned an in-band 1004 error inside the zip.
+    CAISO's OASIS FAQ notes the range cap differs by report; some reports allow a single
+    trade day only.
+  documented: true
+  verified: true
+- id: oasis-all-nodes-window
+  scope: request
+  api: CAISO OASIS Download API
+  limit_count: 1
+  limit_interval: hour-or-trade-date-per-request
+  basis: >-
+    OASIS FAQ: when retrieving all nodes with grp_type=ALL the caller may retrieve only
+    one hour (interval reports) or one trade date (hourly reports) at a time.
+  documented: true
+  verified: false
+retention:
+  window: 39 months
+  basis: >-
+    OASIS FAQ Question Two — "The OASIS data retention for the majority of the reports
+    available is the previous 39 months."
+guidance:
+- Space OASIS requests at least five seconds apart per source IP.
+- >-
+  Consult the Publication and Revisions Log and the Publication Schedule reports before
+  polling, as recommended in section 4 of the Interface Specification, rather than
+  polling blindly for data that has not yet posted.
+- >-
+  Use GroupZip for whole-day, all-node pulls instead of looping SingleZip per node — the
+  spec designates GroupZip for exactly that case.
+- >-
+  Do not use the API to monitor availability or performance of CAISO systems; the API
+  Terms of Use prohibit benchmarking and monitoring use.
+sources:
+- https://www.caiso.com/privacy-terms-of-use#api-terms-of-use
+- https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf
+- https://www.caiso.com/documents/oasisapispecification.pdf

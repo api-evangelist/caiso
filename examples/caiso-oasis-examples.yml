@@ -1,0 +1,178 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Requests taken from CAISO's published OASIS FAQ and Interface Specification examples and
+  re-issued live against the production hosts on 2026-07-27; every status code, header and
+  payload excerpt below is what actually came back.
+description: >-
+  Worked, verified request/response pairs for CAISO's two anonymous public interfaces. All
+  requests are plain HTTP GET with no credentials. Payload excerpts are truncated to the
+  first rows; nothing here is synthesized.
+examples:
+- id: oasis-demand-forecast-csv
+  api: CAISO OASIS Download API
+  description: Day-ahead system demand forecast for one trade day, CSV.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=SLD_FCST&market_run_id=DAM&resultformat=6&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    content_disposition: inline; filename=20260720_20260721_SLD_FCST_DAM_20260727_14_19_18_v1.zip
+    bytes: 8952
+    archive_member: 20260720_20260721_SLD_FCST_DAM_20260727_14_19_18_v1.csv
+    member_bytes: 119985
+    body_excerpt: |
+      INTERVALSTARTTIME_GMT,INTERVALENDTIME_GMT,LOAD_TYPE,OPR_DT,OPR_HR,OPR_INTERVAL,MARKET_RUN_ID,TAC_AREA_NAME,LABEL,XML_DATA_ITEM,POS,MW,EXECUTION_TYPE,GROUP
+      2026-07-20T23:00:00-00:00,2026-07-21T00:00:00-00:00,1,2026-07-20,17,0,DAM,AVA,Demand Forecast Day Ahead,SYS_FCST_DA_MW,6.8,1715.46,DAM,1
+      2026-07-21T01:00:00-00:00,2026-07-21T02:00:00-00:00,1,2026-07-20,19,0,DAM,AVA,Demand Forecast Day Ahead,SYS_FCST_DA_MW,6.8,1726.79,DAM,1
+  verified: '2026-07-27'
+- id: oasis-day-ahead-lmp-single-node
+  api: CAISO OASIS Download API
+  description: Day-ahead LMP for a single PNode, CSV.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=PRC_LMP&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&market_run_id=DAM&node=LAPLMG1_7_B2&resultformat=6
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    bytes: 1700
+    archive_member: 20260720_20260721_PRC_LMP_DAM_20260727_06_13_39_v1.csv
+  verified: '2026-07-27'
+  note: >-
+    Recorded during the 2026-07-27 provider review. CAISO's FAQ example for this report
+    uses version=12; version=1 also returns data.
+- id: oasis-renewables-forecast
+  api: CAISO OASIS Download API
+  description: Wind and solar forecast, CSV — CAISO's own FAQ Question Seven example.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?resultformat=6&queryname=SLD_REN_FCST&version=1&market_run_id=DAM&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    bytes: 1857
+  verified: '2026-07-27'
+- id: oasis-atlas-pnode-reference
+  api: CAISO OASIS Download API
+  description: Full ATLAS PNode reference listing — the node dictionary the price reports key on.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=ATL_PNODE&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&resultformat=6
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    bytes: 266800
+  verified: '2026-07-27'
+- id: oasis-groupzip-day-ahead-lmp
+  api: CAISO OASIS Download API
+  description: Whole-day, all-node day-ahead LMP bundle via the GroupZip servlet.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/GroupZip?groupid=DAM_LMP_GRP&startdatetime=20260720T07:00-0000&version=1&resultformat=6
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    bytes: 10161976
+  verified: '2026-07-27'
+  note: Ten megabytes for one trade day — use GroupZip rather than looping SingleZip per node.
+- id: oasis-error-invalid-report
+  api: CAISO OASIS Download API
+  description: >-
+    Error handling — an unknown queryname still returns HTTP 200 with the error inside the
+    zipped XML.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=NOT_A_REPORT&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1&resultformat=6
+  response:
+    status: 200
+    content_type: application/x-zip-compressed
+    content_disposition: inline; filename=INVALID_REQUEST.xml.zip
+    body_excerpt: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <m:OASISReport xmlns:m="http://www.caiso.com/soa/OASISReport_v1.xsd">
+      <m:MessageHeader>
+      	<m:TimeDate>2026-07-27T21:19:31.777Z</m:TimeDate>
+      	<m:Source>OASIS</m:Source>
+      	<m:Version>v20131201</m:Version>
+      </m:MessageHeader>
+      <m:MessagePayload>
+      <m:RTO>
+      <m:name>CAISO</m:name>
+      <m:ERROR>
+      <m:ERR_CODE>1001</m:ERR_CODE>
+      <m:ERR_DESC>Invalid Parameters of the given report name</m:ERR_DESC>
+      </m:ERROR>
+      </m:RTO>
+      </m:MessagePayload>
+      </m:OASISReport>
+  verified: '2026-07-27'
+- id: oasis-error-range-too-wide
+  api: CAISO OASIS Download API
+  description: Requesting more than 31 days returns in-band error 1004.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=PRC_LMP&startdatetime=20240101T07:00-0000&enddatetime=20260101T07:00-0000&version=12&market_run_id=DAM&node=LAPLMG1_7_B2&resultformat=6
+  response:
+    status: 200
+    error_code: '1004'
+    error_description: Data can be requested for period of 31 days only
+  verified: '2026-07-27'
+- id: oasis-throttle
+  api: CAISO OASIS Download API
+  description: >-
+    Two identical valid requests issued back to back — the second is rejected by the edge.
+  request:
+    method: GET
+    url: https://oasis.caiso.com/oasisapi/SingleZip?queryname=SLD_FCST&market_run_id=DAM&resultformat=6&startdatetime=20260720T07:00-0000&enddatetime=20260721T07:00-0000&version=1
+    note: issued twice with no delay
+  response:
+    first: {status: 200, bytes: 8952}
+    second:
+      status: 429
+      content_type: text/html
+      bytes: 114
+      body: <html><body><p>CAISO Acceptable Use Policy Violation. Please retry your request after 5 seconds.</p></body></html>
+  verified: '2026-07-27'
+- id: outlook-fuel-mix
+  api: CAISO Today's Outlook Data Feeds
+  description: Current-day generation by fuel type at five-minute resolution.
+  request:
+    method: GET
+    url: https://www.caiso.com/outlook/current/fuelsource.csv
+  response:
+    status: 200
+    content_type: text/csv
+    bytes: 11031
+    body_excerpt: |
+      Time,Solar,Wind,Geothermal,Biomass,Biogas,Small hydro,Coal,Nuclear,Natural Gas,Large Hydro,Batteries,Imports,Other
+      00:00,-68,4649,717,239,165,300,0,2280,13558,3061,775,3379,0
+  verified: '2026-07-27'
+- id: outlook-demand
+  api: CAISO Today's Outlook Data Feeds
+  description: Current-day demand with day-ahead and hour-ahead forecasts.
+  request:
+    method: GET
+    url: https://www.caiso.com/outlook/current/demand.csv
+  response:
+    status: 200
+    content_type: text/csv
+    bytes: 7005
+    body_excerpt: |
+      Time,Day ahead forecast,Hour ahead forecast,Current demand,Demand response
+      00:00,30243,29312,29138,
+  verified: '2026-07-27'
+- id: outlook-history
+  api: CAISO Today's Outlook Data Feeds
+  description: A past operating day, same schema as the current-day feed.
+  request:
+    method: GET
+    url: https://www.caiso.com/outlook/history/20260720/netdemand.csv
+  response:
+    status: 200
+    content_type: text/csv
+    bytes: 9284
+    body_excerpt: |
+      Time,Hour ahead forecast,Current demand,Net demand,Net demand forecast,Demand response
+      00:00,28824,28646,23486,24832,
+  verified: '2026-07-27'

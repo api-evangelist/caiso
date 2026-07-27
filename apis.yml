@@ -76,6 +76,26 @@ apis:
     url: https://developer.caiso.com/_login/developersignup.aspx
   - type: Portal
     url: https://oasis.caiso.com/mrioasis/logon.do
+  - type: APIReference
+    url: https://www.caiso.com/documents/oasisapispecification.pdf
+  - type: TermsOfService
+    url: https://www.caiso.com/privacy-terms-of-use#api-terms-of-use
+  - type: Authentication
+    url: authentication/caiso-authentication.yml
+  - type: Conventions
+    url: conventions/caiso-conventions.yml
+  - type: ErrorCatalog
+    url: errors/caiso-error-codes.yml
+  - type: RateLimits
+    url: rate-limits/caiso-rate-limits.yml
+  - type: Vocabulary
+    url: vocabulary/caiso-oasis-query-names.yml
+  - type: Examples
+    url: examples/caiso-oasis-examples.yml
+  - type: Lifecycle
+    url: lifecycle/caiso-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/caiso-changelog.yml
 - aid: caiso:caiso-todays-outlook-data-feeds
   name: CAISO Today's Outlook Data Feeds
   description: >-
@@ -102,7 +122,17 @@ apis:
     url: https://www.caiso.com/todays-outlook/supply
   - type: Documentation
     url: https://www.caiso.com/todays-outlook/emissions
+  - type: TermsOfService
+    url: https://www.caiso.com/privacy-terms-of-use#api-terms-of-use
+  - type: Authentication
+    url: authentication/caiso-authentication.yml
+  - type: Vocabulary
+    url: vocabulary/caiso-oasis-query-names.yml
+  - type: Examples
+    url: examples/caiso-oasis-examples.yml
 common:
+- type: DomainSecurity
+  url: security/caiso-domain-security.yml
 - type: Website
   url: https://www.caiso.com/
 - type: DeveloperPortal
@@ -121,6 +151,40 @@ common:
   url: https://www.caiso.com/library/business-practice-manuals
 - type: Blog
   url: https://www.caiso.com/about/news
+- type: Blog
+  url: https://www.caiso.com/about/news/energy-matters-blog
+- type: GettingStarted
+  url: https://www.caiso.com/getting-started
+- type: APIReference
+  url: https://www.caiso.com/documents/oasisapispecification.pdf
+- type: TermsOfService
+  url: https://www.caiso.com/privacy-terms-of-use#api-terms-of-use
+- type: PrivacyPolicy
+  url: https://www.caiso.com/privacy-terms-of-use
+- type: Roadmap
+  url: https://www.caiso.com/systems-applications/release-planning
+- type: Authentication
+  url: authentication/caiso-authentication.yml
+- type: Conventions
+  url: conventions/caiso-conventions.yml
+- type: ErrorCatalog
+  url: errors/caiso-error-codes.yml
+- type: RateLimits
+  url: rate-limits/caiso-rate-limits.yml
+- type: Lifecycle
+  url: lifecycle/caiso-lifecycle.yml
+- type: ChangeLog
+  url: changelog/caiso-changelog.yml
+- type: Vocabulary
+  url: vocabulary/caiso-oasis-query-names.yml
+- type: Conformance
+  url: conformance/caiso-conformance.yml
+- type: Examples
+  url: examples/caiso-oasis-examples.yml
+- type: Packages
+  url: packages/caiso-packages.yml
+- type: LLMsTxt
+  url: llms/caiso-llms.txt
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

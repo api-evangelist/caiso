@@ -1,0 +1,55 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Registry searches of PyPI, npm, Maven Central, RubyGems, crates.io, pkg.go.dev and
+  Packagist, plus the CAISO developer portal and GitHub, on 2026-07-27
+description: >-
+  CAISO publishes no client libraries in any language. There is no first-party SDK, no CLI,
+  and no CAISO-owned source repository for API tooling — the "CAISO" GitHub organization
+  that exists (github.com/CAISO) has one public repository, a fork of the Craft CMS
+  composer starter, with no members listed and nothing connecting it to the OASIS API, so
+  it is not recorded as a first-party developer surface. Every client library that exists
+  for OASIS is community-built. They are listed here because they are how most consumers
+  actually reach this API, but none is official and none is endorsed by CAISO.
+official_sdks: 0
+packages:
+- language: python
+  registry: pypi
+  name: gridstatus
+  version_seen: 0.36.0
+  url: https://pypi.org/project/gridstatus/
+  install: pip install gridstatus
+  source: https://github.com/gridstatus/gridstatus
+  official: false
+  description: >-
+    Community multi-ISO client (CAISO, ERCOT, MISO, PJM, NYISO, ISO-NE and others) that
+    wraps the OASIS Download API and the Today's Outlook feeds in pandas dataframes.
+- language: python
+  registry: pypi
+  name: pycaiso
+  version_seen: 0.2.7
+  url: https://pypi.org/project/pycaiso/
+  install: pip install pycaiso
+  source: https://github.com/seanswe/pycaiso
+  official: false
+  description: Single-purpose community wrapper for the CAISO OASIS API.
+- language: python
+  registry: pypi
+  name: pyiso
+  version_seen: 0.4.0
+  url: https://pypi.org/project/pyiso/
+  install: pip install pyiso
+  source: https://github.com/WattTime/pyiso
+  official: false
+  description: >-
+    WattTime's multi-ISO client library for power grid data sources, including CAISO.
+    Long-standing but no longer actively maintained.
+registries_probed:
+- {registry: pypi, first_party_hits: 0}
+- {registry: npm, first_party_hits: 0, note: 'searches for "caiso" return unrelated packages (a Siemens demo component, an n8n node)'}
+- {registry: maven-central, first_party_hits: 0}
+- {registry: nuget, first_party_hits: 0}
+- {registry: rubygems, first_party_hits: 0}
+- {registry: packagist, first_party_hits: 0}
+- {registry: crates.io, first_party_hits: 0}
+- {registry: pkg.go.dev, first_party_hits: 0}

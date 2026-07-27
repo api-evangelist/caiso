@@ -1,0 +1,88 @@
+generated: '2026-07-27'
+method: searched
+source: live probes of the CAISO corporate, OASIS API and developer-site hosts
+description: >-
+  CAISO publishes no /.well-known/ discovery surface anywhere in its public estate. Every
+  RFC 9116 security.txt, RFC 8414 oauth-authorization-server, OIDC openid-configuration,
+  RFC 9727 api-catalog and ai-plugin.json probe returned 404 on www.caiso.com and
+  oasis.caiso.com. developer.caiso.com is a SharePoint site that answers every unknown
+  path with an HTTP 200 (or 500) SharePoint error page rather than a 404, so its responses
+  are recorded with that caveat and are not treated as discovery documents. There is no
+  OAuth or OpenID Connect anywhere in the public CAISO API surface — the OASIS Download
+  API and the Today's Outlook feeds are anonymous, and the participant systems use PKI
+  client certificates issued through a company User Access Administrator — so the absence
+  of an authorization-server document is expected rather than a gap.
+hosts:
+- host: https://oasis.caiso.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /openapi.json
+    status: 404
+  - path: /oasisapi/openapi.json
+    status: 404
+  - path: /oasisapi/swagger.json
+    status: 404
+  - path: /oasisapi/v1/openapi.json
+    status: 404
+  - path: /oasisapi/api-docs
+    status: 404
+  - path: /oasisapi/docs
+    status: 404
+  - path: /soa/OASISReport_v1.xsd
+    status: 404
+    note: >-
+      The XML payloads declare the namespace http://www.caiso.com/soa/OASISReport_v1.xsd
+      but the XSD is not served at that URL; the schemas are distributed through the
+      access-gated developer site, not anonymously.
+- host: https://www.caiso.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /openapi.json
+    status: 404
+  - path: /asyncapi.yaml
+    status: 404
+  - path: /graphql
+    status: 404
+  - path: /robots.txt
+    status: 200
+    note: 'Two directives only: Disallow /resources/*, Allow /.'
+- host: https://developer.caiso.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 500
+    note: SharePoint error page, not a security.txt.
+  - path: /openapi.json
+    status: 200
+    note: >-
+      Soft 404 — the body is a SharePoint "Error" HTML page, not an OpenAPI document.
+      Confirmed by requesting a nonsense path (/zzzznotreal.json), which also returns 200
+      with the same shell.
+  - path: /swagger.json
+    status: 200
+    note: Same SharePoint error shell as /openapi.json.
+  - path: /llms.txt
+    status: 404
+findings:
+  security_txt: false
+  openid_configuration: false
+  oauth_authorization_server: false
+  api_catalog: false
+  ai_plugin: false
+  llms_txt: false
+  openapi: false
+  graphql: false
+  mcp: false
