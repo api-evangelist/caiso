@@ -28,6 +28,17 @@ description: >-
   exists here and none is expected to; the obligation CAISO answers to is FERC's
   open-access transparency regime, not a consumer data right. No OpenAPI,
   AsyncAPI, or other machine-readable contract is published for any of it.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://www.caiso.com/apple-touch-icon.png
 tags:
 - Energy
