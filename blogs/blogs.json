@@ -2,20 +2,20 @@
   "repo": "caiso",
   "feeds": [
     {
-      "source": "https://www.caiso.com/library/business-practice-manuals",
-      "feed_url": "https://www.caiso.com/library/business-practice-manuals",
+      "source": "https://www.caiso.com/about/news",
+      "feed_url": "https://www.caiso.com/about/news",
       "title": "",
       "saved": 0,
       "method": "none"
     },
     {
-      "source": "https://www.caiso.com/about/news",
-      "feed_url": "https://www.caiso.com/about/news",
+      "source": "https://www.caiso.com/library/business-practice-manuals",
+      "feed_url": "https://www.caiso.com/library/business-practice-manuals",
       "title": "",
       "saved": 0,
       "method": "none"
     }
   ],
   "post_count": 0,
-  "fetched": "2026-08-30T22:33:40Z"
+  "fetched": "2026-09-06T19:17:18Z"
 }
