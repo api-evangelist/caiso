@@ -1,4 +1,4 @@
-# California ISO (caiso)
+# California ISO
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,95 +64,99 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-The California Independent System Operator (CAISO) is the non-profit public benefit corporation that operates the high-voltage transmission grid serving roughly 80 percent of California plus a portion of Nevada, and runs the wholesale day-ahead and real-time electricity markets, the Western Energy Imbalance Market (WEIM), and the Extended Day-Ahead Market (EDAM). As a system and market operator in the United States it sits at the wholesale layer of the energy value chain — upstream of the investor-owned utilities that bill retail customers, and therefore it holds no retail customer accounts and publishes no consumer usage data. Its API posture is a clean split: market data is genuinely open and consumer data does not exist.
+The California Independent System Operator (CAISO) is the non-profit public benefit corporation that operates the high-voltage transmission grid serving roughly 80 percent of California plus a portion of Nevada, and runs the wholesale day-ahead and real-time electricity markets, the Western Energy Imbalance Market (WEIM), and the Extended Day-Ahead Market (EDAM). As a system and market operator in the United States it sits at the wholesale layer of the energy value chain — upstream of the investor-owned utilities that bill retail customers, and therefore it holds no retail customer accounts and publishes no consumer usage data. Its API posture is a clean split: market data is genuinely open and consumer data does not exist. The OASIS Download API at https://oasis.caiso.com/oasisapi serves locational marginal prices, demand and renewables forecasts, ancillary services, transmission and nodal reference data as zipped CSV or CIM XML to anonymous callers with no key, no account and no registration — CAISO states in writing that every system it operates except OASIS requires a company User Access Administrator to grant access. The Today's Outlook telemetry feeds under https://www.caiso.com/outlook publish five-minute fuel mix, demand, net demand and CO2 as plain CSV, also anonymously. Everything else — market submission, dispatch, settlements and the participant portals — is behind PKI client certificates and UAA-sponsored accounts, and even the OASIS reference documentation on the developer site requires a signup reviewed against a corporate email domain and a written justification. No Green Button, ESPI, or Consumer Data Right surface exists here and none is expected to; the obligation CAISO answers to is FERC's open-access transparency regime, not a consumer data right. No OpenAPI, AsyncAPI, or other machine-readable contract is published for any of it.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/caiso/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/caiso/refs/heads/main/apis.yml)
+**Areas:** Energy · United States · Electricity · Energy Markets · Grid · Renewables · System Operator · Market Data · California
 
-## Tags
+## California ISO on APIs.io
 
-- Energy
-- United States
-- Electricity
-- Energy Markets
-- Grid
-- Renewables
-- System Operator
-- Market Data
-- California
+Everything profiled for California ISO is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/caiso/](https://apis.io/providers/caiso/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (2)
 
-- **Created:** 2026-07-27
-- **Modified:** 2026-07-27
+- [CAISO OASIS Download API](https://apis.io/apis/caiso/caiso-oasis-download-api/) — The Open Access Same-time Information System (OASIS) Download API — CAISO's public wholesale market data interface. Two servlets, SingleZip and GroupZip,…
+- [CAISO Today's Outlook Data Feeds](https://apis.io/apis/caiso/caiso-todays-outlook-data-feeds/) — The CSV feeds behind CAISO's public Today's Outlook dashboard. Anonymous GET requests to https://www.caiso.com/outlook/current/{report}.csv return the…
 
-## APIs
+### Published properties
 
-### CAISO OASIS Download API
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-The Open Access Same-time Information System (OASIS) Download API — CAISO's public wholesale market data interface. Two servlets, SingleZip and GroupZip, accept a `queryname` or `groupid` plus a UTC datetime range and return a ZIP containing CIM-format XML (`resultformat=5`) or CSV (`resultformat=6`). Report families cover locational marginal prices (`PRC_LMP`, `PRC_INTVL_LMP`, `PRC_CURR_LMP`), system load and renewables forecasts (`SLD_FCST`, `SLD_REN_FCST`), ancillary services, congestion revenue rights, and the ATLAS reference data set (`ATL_PNODE` and friends). Requests are anonymous — no API key, token, or account.
+#### Security (2)
 
-- **Human URL:** [https://www.caiso.com/systems-applications/developer-portal](https://www.caiso.com/systems-applications/developer-portal)
-- **Base URL:** `https://oasis.caiso.com/oasisapi`
+Authentication, trust centre, and vulnerability disclosure.
 
-#### Tags
+- [Caiso Authentication](https://apis.io/security/caiso/caiso-authentication/)
+- [Caiso Domain Security](https://apis.io/security/caiso/caiso-domain-security/)
 
-- Energy Markets
-- Electricity
-- Market Data
-- Pricing
-- Forecasting
-- Grid
+#### Rate limits (1)
 
-#### Properties
+Published request limits.
 
-- [Documentation](https://www.caiso.com/documents/oasis-frequently-asked-questions.pdf) — OASIS Frequently Asked Questions
-- [Documentation](https://www.caiso.com/documents/oasisapispecification.pdf) — Interface Specification for OASIS
-- [Documentation](https://www.caiso.com/systems-applications/developer-portal)
-- [Sign Up](https://developer.caiso.com/_login/developersignup.aspx)
-- [Portal](https://oasis.caiso.com/mrioasis/logon.do)
+- [Caiso Rate Limits](https://apis.io/rate-limits/caiso/caiso-rate-limits/)
 
-### CAISO Today's Outlook Data Feeds
+## Where to find this API
 
-The CSV feeds behind CAISO's public Today's Outlook dashboard. Anonymous GET requests to `https://www.caiso.com/outlook/current/{report}.csv` return the current operating day at five-minute resolution, and `https://www.caiso.com/outlook/history/{YYYYMMDD}/{report}.csv` returns a past day. Confirmed reports are `fuelsource`, `demand`, `netdemand`, and `co2`. CAISO notes these are telemetry-based summaries and will not tie out to the market-based numbers in OASIS.
-
-- **Human URL:** [https://www.caiso.com/todays-outlook](https://www.caiso.com/todays-outlook)
-- **Base URL:** `https://www.caiso.com/outlook`
-
-#### Tags
-
-- Grid
-- Renewables
-- Carbon
-- Electricity
-- Market Data
-
-#### Properties
-
-- [Documentation](https://www.caiso.com/todays-outlook)
-- [Documentation](https://www.caiso.com/todays-outlook/supply)
-- [Documentation](https://www.caiso.com/todays-outlook/emissions)
-
-## Common Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.caiso.com/)
-- [Developer Portal](https://developer.caiso.com/)
 - [Documentation](https://www.caiso.com/systems-applications/developer-portal)
-- [Sign Up](https://developer.caiso.com/_login/developersignup.aspx)
-- [Authentication](https://www.caiso.com/systems-applications/requesting-access-certificates)
-- [Portal](https://www.caiso.com/systems-applications/portals-applications)
+- [Getting started](https://www.caiso.com/getting-started)
+- [API reference](https://www.caiso.com/documents/oasisapispecification.pdf)
+- [Sign up](https://developer.caiso.com/_login/developersignup.aspx)
 - [Support](https://caiso.my.site.com/custsvccomm/s/knowledge-articles)
-- [Documentation](https://www.caiso.com/library/business-practice-manuals)
 - [Blog](https://www.caiso.com/about/news)
+- [Terms of service](https://www.caiso.com/privacy-terms-of-use#api-terms-of-use)
+- [Privacy policy](https://www.caiso.com/privacy-terms-of-use)
 
-## Mandate and Access Posture
+## API Evangelist rating
 
-- **Mandate regime:** `other` — US federal open-access wholesale transparency (FERC Order Nos. 888/889 OASIS requirement), **not** a consumer data right.
-- **Mandate status:** `live-implemented` — verified by anonymous `curl` against `https://oasis.caiso.com/oasisapi/SingleZip` on 2026-07-27, which returned HTTP 200 and a ZIP containing real day-ahead LMP CSV rows. Five further query names were confirmed the same way.
-- **Data standard:** IEC CIM-derived XML for OASIS payloads (per the OASIS interface specification), with a CSV alternative; query and report vocabulary is proprietary to CAISO. No Green Button / ESPI reference found anywhere.
-- **Consumer data API:** none, and none possible — CAISO has no retail customers.
-- **Market data open:** yes — OASIS plus the Today's Outlook CSV feeds, both fully anonymous.
-- **Access gate:** `self-serve` for the API surface (literally no credential of any kind). The *documentation* is `application-approval`: CAISO's OASIS FAQ states developer-site signup requires a recognized corporate email domain and a detailed justification, and consumer email domains "would be subject to rejection." Every other CAISO system is `partner-only` behind a company User Access Administrator plus PKI client certificates.
-- **Auth model:** none for OASIS and Today's Outlook; forms-based SharePoint login for the developer documentation site; X.509 client certificates chained to the CAISO issuing authority plus UAA-sponsored accounts for participant systems. No OpenID Connect discovery document is served.
-- **Machine-readable contracts:** none published. No OpenAPI, AsyncAPI, Postman collection, or GraphQL schema was found, so no `openapi/` directory exists in this repo.
+**Kin Score 36.8** — thin · rubric 0.24.0 · scored 2026-10-17
 
-See [`review.yml`](review.yml) for the full probe log with HTTP status for every URL tested.
+| Facet | Score |
+|---|---|
+| Discoverability | 66.1 |
+| Contract quality | 6.5 |
+| Contract governance | 19.7 |
+| Operational transparency | 52.6 |
+| Developer ergonomics | 57.1 |
+| Access clarity | 34.2 |
+
+**Agent readiness 9.2** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | documented (partial credit) |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 20.5** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/caiso/](https://apis.io/providers/caiso/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for California ISO: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/caiso/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
